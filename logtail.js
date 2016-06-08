@@ -15,7 +15,7 @@ var poll = 1000; /* 1s */
 var kill = false;
 var loading = false;
 var pause = false;
-var reverse = true;
+var reverse = false;
 var log_data = "";
 var log_file_size = 0;
 
@@ -151,10 +151,14 @@ function show_log() {
         t = t_a.join("\n");
     }
 
-    if (fix_rn)
-        t = t.replace(/\n/g, "\r\n");
-
     $(dataelem).text(t);
+
+    // Convert ASCII color codes
+    if (typeof ansi_up !== typeof undefined ? true : false) {
+      ansi = $(dataelem).html();
+      $(dataelem).html(ansi_up.ansi_to_html(ansi));
+    }
+
     if (!reverse)
         scroll(-1);
 }
@@ -175,8 +179,8 @@ $(document).ready(function () {
 
     /* If URL is /logtail/?noreverse display in chronological order */
     var hash = location.search.replace(/^\?/, "");
-    if (hash == "noreverse")
-        reverse = false;
+    if (hash == "reverse")
+        reverse = true;
 
     /* Add pause toggle */
     $(pausetoggle).click(function (e) {
